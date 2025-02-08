@@ -13,8 +13,8 @@ import (
 
 const (
 	url              = "http://localhost:5001/api/v1/users"
-	totalRequests    = 8869
-	concurrencyLimit = 30 // Adjust this to control concurrency
+	totalRequests    = 100
+	concurrencyLimit = 5 // Adjust this to control concurrency
 )
 
 func generateRandomEmail() string {

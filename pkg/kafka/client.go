@@ -241,15 +241,19 @@ func (k *KafkaClient) processMessageWithRetry(msg *kafka.Message, opt configs.Ka
 	retryPolicy.RandomizationFactor = 0.5 // Jitter
 
 	operation := func() error {
-		// ⬇️ Fresh timeout for each retry attempt
-		ctx, cancel := context.WithTimeout(context.Background(), opt.MaxTimeoutDuration)
-		defer cancel()
+		select {
+		case <-k.ctx.Done(): // stop processing if server is shutting down
+			return context.Canceled
+		default:
+			ctx, cancel := context.WithTimeout(context.Background(), opt.MaxTimeoutDuration)
+			defer cancel()
 
-		err := handler(ctx, msg)
-		if err != nil {
-			k.log.Errorf("Retrying due to error: %v", err)
+			err := handler(ctx, msg)
+			if err != nil {
+				k.log.Errorf("Retrying due to error: %v", err)
+			}
+			return err
 		}
-		return err
 	}
 
 	err := backoff.Retry(operation, retryPolicy)
