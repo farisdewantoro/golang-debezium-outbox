@@ -1,0 +1,106 @@
+version: "3.8"
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - app-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+    networks:
+      - app-network
+    ports:
+      - 9092:9092
+    # command: >
+    #   bash -c "
+    #   /etc/confluent/docker/run &
+    #   sleep 30 &&
+    #   kafka-topics --create --topic dbz.public.outbox_events --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 || true &&
+    #   kafka-topics --create --topic eventdriven-examples.dlq --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 || true &&
+    #   kafka-topics --create --topic notif.user.registration --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 || true &&
+    #   wait"
+
+  postgres:
+    platform: linux/x86_64
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: eventdriven-examples
+    command: >
+      postgres -c wal_level=logical
+               -c max_replication_slots=4
+               -c max_wal_senders=4
+               -c shared_preload_libraries='pg_stat_statements'
+    ports:
+      - 5434:5432
+    expose:
+      - 5434
+    networks:
+      - app-network
+    volumes:
+      - app-postgresql:/var/lib/postgresql/data
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    ports:
+      - "8090:8090"
+    restart: always
+    environment:
+      - SERVER_PORT=8090
+      - KAFKA_CLUSTERS_0_NAME=localhost
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
+    networks:
+      - app-network
+
+
+  connect:
+    image: debezium/connect:2.0
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      BOOTSTRAP_SERVERS: kafka:29092
+      GROUP_ID: "1"
+      CONFIG_STORAGE_TOPIC: debezium_configs
+      OFFSET_STORAGE_TOPIC: debezium_offsets
+      STATUS_STORAGE_TOPIC: debezium_statuses
+    ports:
+      - "8083:8083"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  app-postgresql:
+
+
+  # outbox-consumer:
+  #   build: .
+  #   depends_on:
+  #     - kafka
+  #     - postgres
+  #     - connect
+  #   container_name: outbox-consumer
+  #   volumes:
+  #     - ./config.yaml:/app/config.yaml
+  #   command: ["outbox-consumer"]  
+  #   restart: unless-stopped
+
+
