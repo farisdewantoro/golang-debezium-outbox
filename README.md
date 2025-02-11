@@ -38,6 +38,7 @@ Ex Pooling data : https://github.com/farisdewantoro/golang-atomic-outbox-asynq
 ## Project Overview
 
 This project consists of two main services:
+![alt text](./docs/img/architecture.png)
 
 ### 1. API Server (`api-server`)
 This service handles user registration and generates notifications. It performs the following actions:
