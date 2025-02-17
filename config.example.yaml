@@ -1,0 +1,52 @@
+Meta:
+  Name: eventdriven-examples
+ApiServer:
+  Host: localhost
+  Port: 5001
+SQL:
+  Host: localhost
+  Port: 5434
+  Username: postgres
+  Password: postgres
+  Database: eventdriven-examples
+Redis:
+  Address: localhost:6379
+Outbox:
+  MaxRetries: 3
+  MaxConcurrency: 300
+  MaxBatchSize: 3000
+  DurationIntervalInMs: 5000
+Kafka:
+  Address: localhost:9092
+  GroupId: eventdriven-examples
+  DLQTopic: eventdriven-examples.dlq
+  Options:
+    OutboxEvent:
+      Topic: dbz.public.outbox_events
+      Enable: true
+      UseRegex: false
+      PoolDuration: 100ms
+      MaxConcurrency: 5
+      MaxTimeoutDuration: 30s
+      DLQTopic: dbz.public.outbox_events.dlq
+      RetryMaxElapsedTimeDuration: 1m
+      RetryInitIntervalDuration: 1s
+      RetryMaxIntervalDuration: 30s
+    NotifUserRegistrationEvent:
+      Topic: notif.user.registration
+      Enable: true
+      UseRegex: false
+      PoolDuration: 100ms
+      MaxConcurrency: 5
+      MaxTimeoutDuration: 30s
+      RetryMaxElapsedTimeDuration: 1m
+      RetryInitIntervalDuration: 1s
+      RetryMaxIntervalDuration: 30s
+Debezium:
+  KafkaConnectURL: http://localhost:8083/connectors
+  DBHost: postgres
+  DBPort: 5432
+  DBUsername: postgres
+  DBPassword: postgres
+  DBName: eventdriven-examples
+  TableName: public.outbox_events
