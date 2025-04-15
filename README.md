@@ -125,4 +125,87 @@ This project showcases how to implement a reliable event-driven system using the
 
 ---
 
+# Event Driven System with Kafka
+
+This project uses the Confluent Kafka Go library which requires CGO and system dependencies.
+
+## Prerequisites
+
+- Go 1.22 or higher
+- GCC and build tools
+- librdkafka C library
+
+## Setup
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd golang-debezium-outbox
+```
+
+2. Run the setup command to install dependencies:
+```bash
+make setup
+```
+
+This will:
+- Install required system dependencies (build-essential, pkg-config, librdkafka-dev)
+- Set CGO_ENABLED=1
+- Install Go dependencies
+- Install Swagger CLI and generate documentation
+
+## Building and Running
+
+To build the project:
+```bash
+make build
+```
+
+To clean build artifacts:
+```bash
+make clean
+```
+
+To run tests:
+```bash
+make test
+```
+
+To generate Swagger documentation:
+```bash
+make swagger
+```
+
+## Swagger Documentation
+
+The project includes Swagger/OpenAPI documentation. After running `make setup`, you can:
+
+1. View the generated Swagger documentation at `docs/api/swagger.yaml` or `docs/api/swagger.json`
+2. Access the generated API models in `internal/generated/api_models`
+
+To regenerate the Swagger documentation:
+```bash
+make swagger
+```
+
+## Important Notes
+
+- The project requires CGO to be enabled (CGO_ENABLED=1)
+- Make sure you have the librdkafka-dev package installed
+- If you encounter any build errors, try running `make setup` again
+- Swagger CLI will be installed automatically during setup
+
+## Troubleshooting
+
+If you encounter "undefined: kafka.Producer" errors:
+1. Make sure CGO_ENABLED=1 is set
+2. Verify librdkafka-dev is installed
+3. Run `make setup` to reinstall dependencies
+4. Run `make clean` followed by `make build`
+
+If you encounter Swagger-related errors:
+1. Run `make swagger-install` to reinstall the Swagger CLI
+2. Run `make swagger` to regenerate the documentation
+3. Make sure all Swagger YAML files are properly formatted
+
 
