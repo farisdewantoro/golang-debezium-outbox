@@ -60,75 +60,6 @@ This service listens for new events in the Kafka topic and processes them. It:
 
 ## Getting Started
 
-### Prerequisites
-Ensure you have the following installed:
-- Docker & Docker Compose
-- Golang (latest stable version)
-
-### Running the Project
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/farisdewantoro/golang-debezium-outbox.git
-   cd golang-debezium-outbox
-   ```
-
-2. Start all services using Docker Compose:
-   ```sh
-   docker-compose up -d
-   ```
-3. Install & Generate Swagger Docs:
-  ```
-    make swagger-install
-    make swagger
-  ```
-4. Run Database Migration
-  ```
-    make db-migrate-up
-  ```
-5. Create Kafka Topic
-  ```sh
-    docker exec -it go-outbox-debezium-kafka bash 
-    kafka-topics --create --topic dbz.public.outbox_events --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 || true &&
-    kafka-topics --create --topic eventdriven-examples.dlq --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 || true &&
-    kafka-topics --create --topic notif.user.registration --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 || true &&
-  ```
-6. Run the services:
-   - Start the API Server:
-   ```sh
-    go run main.go api-server
-   ```
-   - Kafka Consumer: 
-  ```sh
-    go run main.go kafka-consumer
-  ```
-
-## Usage
-### Register a User
-Send a `POST` request to register a user:
-```sh
-curl --location 'http://localhost:5001/api/v1/users' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "email":"faris-email@gmail.com",
-    "password":"this-sample-password"
-}'
-```
-This will create an outbox entry for notification processing.
-
-
-### Monitoring the Event
-To Open Kafka UI open `http://localhost:8090` in your browser.
-
-
-## Conclusion
-This project showcases how to implement a reliable event-driven system using the **Outbox Pattern with Debezium**. By leveraging CDC, we ensure that database writes and event publishing occur atomically, preventing inconsistencies and ensuring smooth inter-service communication.
-
----
-
-# Event Driven System with Kafka
-
-This project uses the Confluent Kafka Go library which requires CGO and system dependencies.
-
 ## Prerequisites
 
 - Go 1.22 or higher
@@ -154,27 +85,7 @@ This will:
 - Install Go dependencies
 - Install Swagger CLI and generate documentation
 
-## Building and Running
 
-To build the project:
-```bash
-make build
-```
-
-To clean build artifacts:
-```bash
-make clean
-```
-
-To run tests:
-```bash
-make test
-```
-
-To generate Swagger documentation:
-```bash
-make swagger
-```
 
 ## Swagger Documentation
 
@@ -209,3 +120,56 @@ If you encounter Swagger-related errors:
 3. Make sure all Swagger YAML files are properly formatted
 
 
+### Running the Project
+1. Start all services using Docker Compose:
+   ```sh
+   docker-compose up -d
+   ```
+2. Install & Generate Swagger Docs:
+  ```
+    make swagger-install
+    make swagger
+  ```
+3. Run Database Migration
+  ```
+    make db-migrate-up
+  ```
+4. Create Kafka Topic
+  ```sh
+    docker exec -it go-outbox-debezium-kafka bash 
+    kafka-topics --create --topic dbz.public.outbox_events --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 || true &&
+    kafka-topics --create --topic eventdriven-examples.dlq --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 || true &&
+    kafka-topics --create --topic notif.user.registration --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 || true &&
+  ```
+5. Run the services:
+   - Start the API Server:
+   ```sh
+    go run main.go api-server
+   ```
+   - Kafka Consumer: 
+  ```sh
+    go run main.go kafka-consumer
+  ```
+
+## Usage
+### Register a User
+Send a `POST` request to register a user:
+```sh
+curl --location 'http://localhost:5001/api/v1/users' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email":"faris-email@gmail.com",
+    "password":"this-sample-password"
+}'
+```
+This will create an outbox entry for notification processing.
+
+
+### Monitoring the Event
+To Open Kafka UI open `http://localhost:8090` in your browser.
+
+
+## Conclusion
+This project showcases how to implement a reliable event-driven system using the **Outbox Pattern with Debezium**. By leveraging CDC, we ensure that database writes and event publishing occur atomically, preventing inconsistencies and ensuring smooth inter-service communication.
+
+---
