@@ -67,7 +67,6 @@ mockgen:
 	mockgen -source=internal/domain/user/user.go -destination=internal/mocks/domain/user_mock.go -package=mocks
 	mockgen -source=internal/domain/notification/notification.go -destination=internal/mocks/domain/notification_mock.go -package=mocks
 	mockgen -source=internal/domain/outbox/outbox.go -destination=internal/mocks/domain/outbox_mock.go -package=mocks
-	mockgen -source=pkg/logger/logger.go -destination=internal/mocks/logger_mock.go -package=mocks
 
 # Build the project
 build:
