@@ -3,6 +3,7 @@ package domain
 import (
 	"eventdrivensystem/configs"
 	"eventdrivensystem/internal/domain/notification"
+	"eventdrivensystem/internal/domain/order"
 	"eventdrivensystem/internal/domain/outbox"
 	"eventdrivensystem/internal/domain/user"
 	"eventdrivensystem/pkg/logger"
@@ -14,6 +15,7 @@ type Domain struct {
 	User         user.UserDomainHandler
 	Outbox       outbox.OutboxDomainHandler
 	Notification notification.NotificationDomainHandler
+	Order        order.OrderDomainHandler
 }
 
 func NewDomain(cfg *configs.AppConfig,
@@ -27,5 +29,6 @@ func NewDomain(cfg *configs.AppConfig,
 			log,
 			db,
 		),
+		Order: order.NewOrderDomain(cfg, log, db),
 	}
 }

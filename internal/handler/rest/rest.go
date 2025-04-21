@@ -25,4 +25,5 @@ func (r *RouterHandler) RegisterRoutes() {
 	base := r.echo.Group("/api")
 
 	r.RegisterUserRoutes(base)
+	r.RegisterOrderRoutes(base)
 }

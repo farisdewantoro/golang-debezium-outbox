@@ -6,4 +6,6 @@ const (
 
 	NotificationTypeUserRegistration    string = "USER_REGISTRATION"
 	NotificationMessageUserRegistration string = "Welcome! Your account has been created successfully."
+
+	NotificationTypeOrderCreated string = "ORDER_CREATED"
 )
