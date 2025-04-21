@@ -52,7 +52,23 @@ func sendRequest(client *http.Client, email string, wg *sync.WaitGroup, semaphor
 	results <- RequestResult{Email: email, Status: resp.StatusCode, Error: nil}
 }
 
+func checkServerRunning() bool {
+	client := &http.Client{
+		Timeout: 1 * time.Second,
+	}
+	resp, err := client.Get(url)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	return true
+}
+
 func TestSendRequest(t *testing.T) {
+	if !checkServerRunning() {
+		t.Skip("Skipping integration test because server is not running")
+	}
+
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	var wg sync.WaitGroup

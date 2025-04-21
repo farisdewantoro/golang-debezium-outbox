@@ -8,10 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserDomainWriter interface {
-	CreateUser(ctx context.Context, user *models.User, opts ...util.DbOptions) (*models.User, error)
-}
-
 func (u *UserDomain) CreateUser(ctx context.Context, user *models.User, opts ...util.DbOptions) (*models.User, error) {
 	return u.createUserSql(ctx, user, opts...)
 }

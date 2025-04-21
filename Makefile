@@ -1,4 +1,4 @@
-.PHONY: swagger swagger-concat swagger-server swagger-install setup build clean test help
+.PHONY: swagger swagger-concat swagger-server swagger-install setup build clean test help mockgen
 
 # Default target
 all: setup build
@@ -15,6 +15,10 @@ setup:
 	go mod tidy
 	@echo "Installing Swagger..."
 	$(MAKE) swagger-install
+	@echo "Installing mockgen..."
+	go install github.com/golang/mock/mockgen@v1.6.0
+	@echo "Generating mocks..."
+	$(MAKE) mockgen
 	@echo "Generating Swagger documentation..."
 	$(MAKE) swagger
 
@@ -56,6 +60,14 @@ new-migration:
 
 db-migrate-up:
 	@go run main.go db-migrate-up
+
+mockgen:
+	@echo "Generating mocks..."
+	@mkdir -p internal/mocks/domain
+	mockgen -source=internal/domain/user/user.go -destination=internal/mocks/domain/user_mock.go -package=mocks
+	mockgen -source=internal/domain/notification/notification.go -destination=internal/mocks/domain/notification_mock.go -package=mocks
+	mockgen -source=internal/domain/outbox/outbox.go -destination=internal/mocks/domain/outbox_mock.go -package=mocks
+	mockgen -source=pkg/logger/logger.go -destination=internal/mocks/logger_mock.go -package=mocks
 
 # Build the project
 build:

@@ -1,11 +1,15 @@
 package databases
 
 import (
+	"database/sql"
 	"eventdrivensystem/configs"
 	"fmt"
+	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/labstack/gommon/log"
+	"github.com/stretchr/testify/require"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/plugin/opentelemetry/tracing"
@@ -71,4 +75,29 @@ func NewMigrate(cfg *configs.AppConfig) (*migrate.Migrate, error) {
 
 	return migrator, nil
 
+}
+
+type MockDB struct {
+	DB   *sql.DB
+	Mock sqlmock.Sqlmock
+	Gorm *gorm.DB
+}
+
+func SetupMockDB(t *testing.T) *MockDB {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+
+	dialector := postgres.New(postgres.Config{
+		Conn:       db,
+		DriverName: "postgres",
+	})
+
+	gormDB, err := gorm.Open(dialector, &gorm.Config{})
+	require.NoError(t, err)
+
+	return &MockDB{
+		DB:   db,
+		Mock: mock,
+		Gorm: gormDB,
+	}
 }
