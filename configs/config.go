@@ -42,7 +42,16 @@ type SQL struct {
 }
 
 type Redis struct {
-	Address string `validate:"required"`
+	Address                    string `validate:"required"`
+	RateLimitTokenBucketConfig RateLimitTokenBucketConfig
+}
+
+type RateLimitTokenBucketConfig struct {
+	Capacity  int64         // Maximum number of tokens the bucket can hold
+	Rate      time.Duration // How often a new token is added
+	BaseKey   string        // Redis key for this rate limiter
+	TimeoutMS int64         // Key timeout in milliseconds
+	Enabled   bool          // Enable or disable rate limiting
 }
 
 type Outbox struct {

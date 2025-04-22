@@ -9,7 +9,7 @@ import (
 
 type Order struct {
 	ID        strfmt.UUID4   `gorm:"type:uuid;default:gen_random_uuid();primaryKey;column:id"`
-	UserID    uint           `json:"user_id"`
+	UserID    strfmt.UUID4   `json:"user_id"`
 	Total     float64        `json:"total"`
 	Status    string         `json:"status"`
 	CreatedAt time.Time      `json:"created_at"`
@@ -18,8 +18,8 @@ type Order struct {
 }
 
 type CreateOrderParam struct {
-	UserID uint    `json:"user_id"`
-	Total  float64 `json:"total"`
+	UserID strfmt.UUID4 `json:"user_id"`
+	Total  float64      `json:"total"`
 }
 
 func (param *CreateOrderParam) ToDomain() *Order {

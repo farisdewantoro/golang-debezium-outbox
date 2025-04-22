@@ -7,9 +7,7 @@ import (
 	outboxModels "eventdrivensystem/internal/models/outbox"
 	"eventdrivensystem/pkg/errors"
 	"eventdrivensystem/pkg/util"
-	"fmt"
 
-	"github.com/go-openapi/strfmt"
 	"github.com/jackc/pgtype"
 )
 
@@ -48,9 +46,7 @@ func (u *OrderUsecase) CreateOrder(ctx context.Context, param *orderModels.Creat
 		return err
 	}
 
-	// Convert uint UserID to strfmt.UUID4
-	userIDStr := fmt.Sprintf("%d", order.UserID)
-	userUUID := strfmt.UUID4(userIDStr)
+	userUUID := order.UserID
 
 	pNotif := notificationModels.Notification{
 		Status:  notificationModels.NotificationStatusPending,

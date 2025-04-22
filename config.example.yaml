@@ -11,6 +11,12 @@ SQL:
   Database: eventdriven-examples
 Redis:
   Address: localhost:6379
+  RateLimitTokenBucketConfig:
+    Capacity: 15
+    Rate: 1000ms
+    BaseKey: ratelimit:token_bucket
+    TimeoutMS: 100
+    Enabled: true
 Outbox:
   MaxRetries: 3
   MaxConcurrency: 300

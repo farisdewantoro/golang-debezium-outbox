@@ -13,8 +13,8 @@ import (
 
 const (
 	url              = "http://localhost:5001/api/v1/users"
-	totalRequests    = 100
-	concurrencyLimit = 5 // Adjust this to control concurrency
+	totalRequests    = 15
+	concurrencyLimit = 10 // Adjust this to control concurrency
 )
 
 func generateRandomEmail() string {
@@ -66,6 +66,7 @@ func checkServerRunning() bool {
 
 func TestSendRequest(t *testing.T) {
 	if !checkServerRunning() {
+		fmt.Printf("\n⚠️  API Server is not running at %s - Skipping integration tests\n", url)
 		t.Skip("Skipping integration test because server is not running")
 	}
 

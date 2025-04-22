@@ -5,6 +5,7 @@ import (
 	"eventdrivensystem/internal/domain"
 	"eventdrivensystem/internal/handler/rest"
 	"eventdrivensystem/internal/usecase"
+	httpPkg "eventdrivensystem/pkg/http"
 	"fmt"
 	"net/http"
 	"os"
@@ -31,6 +32,12 @@ func RunServer() {
 	e.Use(echoMiddleware.Recover())
 	dp := GetAppDependency()
 
+	// Configure rate limiter
+	rateLimiter := httpPkg.NewRateLimiter(dp.redisClient, dp.cfg.Redis.RateLimitTokenBucketConfig)
+
+	// Add rate limiter middleware
+	e.Use(rateLimiter.RateLimitMiddleware())
+
 	dom := domain.NewDomain(dp.cfg, dp.db, dp.log)
 	uc := usecase.NewUsecase(dp.cfg, dp.log, dom)
 
@@ -43,9 +50,8 @@ func RunServer() {
 		}
 	}()
 
-	// Wait for interrupt signal to gracefully shutdown the server with
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, os.Kill, syscall.SIGTERM, syscall.SIGINT)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
 
 	log.Info("shut down started")
@@ -53,6 +59,9 @@ func RunServer() {
 		log.Errorf("error shutting down api server", err)
 	}
 
-	log.Info("shut down completed")
+	if err := dp.redisClient.Close(); err != nil {
+		log.Errorf("error closing redis connection: %v", err)
+	}
 
+	log.Info("shut down completed")
 }

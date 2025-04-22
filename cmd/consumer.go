@@ -46,6 +46,10 @@ func RunKafkaConsumer() {
 	dp.log.Info("shut down started.....")
 	dp.kafkaClient.Close()
 
-	dp.log.Info("shut down completed.....")
+	// Close Redis connection
+	if err := dp.redisClient.Close(); err != nil {
+		dp.log.Errorf("error closing redis connection: %v", err)
+	}
 
+	dp.log.Info("shut down completed.....")
 }
